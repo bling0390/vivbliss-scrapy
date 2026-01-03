@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.swp
+.venv/
+venv/
+
+# Environment & local config
+.env
+.env.local
+
+# Scrapy state/logs/data
+.scrapy/
+data/
+logs/
+
+# PyCharm/VSCode/macOS
+.idea/
+.vscode/
+.DS_Store
+
+# Docker
+data/mongo/
+data/redis/
+
+category.html
+detail.html

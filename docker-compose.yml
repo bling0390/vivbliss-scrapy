@@ -1,0 +1,103 @@
+version: "3.9"
+
+services:
+  redis:
+    image: redis:7
+    command:
+      - sh
+      - -c
+      - |
+        cat > /usr/local/etc/redis/redis.conf <<EOF
+        appendonly yes
+        requirepass ${REDIS_PASSWORD:-redispass}
+        user default on +@all ~* &* >${REDIS_PASSWORD:-redispass}
+        user ${REDIS_ACL_USER:-app} on +@all ~* &* >${REDIS_ACL_PASSWORD:-redisapp}
+        EOF
+        exec redis-server /usr/local/etc/redis/redis.conf
+    volumes:
+      - ./data/redis:/data
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-redispass}
+      REDIS_ACL_USER: ${REDIS_ACL_USER:-app}
+      REDIS_ACL_PASSWORD: ${REDIS_ACL_PASSWORD:-redisapp}
+
+  mongo:
+    image: mongo:6
+    volumes:
+      - ./data/mongo:/data/db
+      - ./docker/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME:-root}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:-rootpass}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-vivbliss}
+
+  worker:
+    build: .
+    command: ["celery", "-A", "app.tasks", "worker", "-l", "info"]
+    depends_on:
+      - redis
+      - mongo
+    volumes:
+      - .:/app
+      - ./data:/data
+    environment:
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+      MONGO_URI: ${MONGO_URI:-mongodb://mongo:27017}
+      MONGO_DB: ${MONGO_DB:-vivbliss}
+      DATA_DIR: ${DATA_DIR:-/data}
+      CRAWL_SPIDER: ${CRAWL_SPIDER:-products}
+      MESSAGE_STRATEGY: ${MESSAGE_STRATEGY:-S2}
+      CRAWL_LOG: ${CRAWL_LOG:-/data/logs/scrapy.log}
+      TG_API_ID: ${TG_API_ID:-}
+      TG_API_HASH: ${TG_API_HASH:-}
+      TG_BOT_TOKEN: ${TG_BOT_TOKEN:-}
+      TG_SESSION_STRING: ${TG_SESSION_STRING:-}
+      TG_TARGET_CHAT: ${TG_TARGET_CHAT:-}
+
+  beat:
+    build: .
+    command: ["celery", "-A", "app.tasks", "beat", "-l", "info"]
+    depends_on:
+      - worker
+      - redis
+      - mongo
+    volumes:
+      - .:/app
+      - ./data:/data
+    environment:
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+      MONGO_URI: ${MONGO_URI:-mongodb://mongo:27017}
+      MONGO_DB: ${MONGO_DB:-vivbliss}
+      DATA_DIR: ${DATA_DIR:-/data}
+      CRAWL_SPIDER: ${CRAWL_SPIDER:-products}
+      MESSAGE_STRATEGY: ${MESSAGE_STRATEGY:-S2}
+      CRAWL_LOG: ${CRAWL_LOG:-/data/logs/scrapy.log}
+      TG_API_ID: ${TG_API_ID:-}
+      TG_API_HASH: ${TG_API_HASH:-}
+      TG_BOT_TOKEN: ${TG_BOT_TOKEN:-}
+      TG_SESSION_STRING: ${TG_SESSION_STRING:-}
+      TG_TARGET_CHAT: ${TG_TARGET_CHAT:-}
+
+  crawler:
+    build: .
+    command: ["scrapy", "crawl", "products"]
+    depends_on:
+      - mongo
+      - redis
+    volumes:
+      - .:/app
+      - ./data:/data
+    environment:
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+      MONGO_URI: ${MONGO_URI:-mongodb://mongo:27017}
+      MONGO_DB: ${MONGO_DB:-vivbliss}
+      DATA_DIR: ${DATA_DIR:-/data}
+      CRAWL_SPIDER: ${CRAWL_SPIDER:-products}
+      MESSAGE_STRATEGY: ${MESSAGE_STRATEGY:-S2}
+      CRAWL_LOG: ${CRAWL_LOG:-/data/logs/scrapy.log}
+      TG_API_ID: ${TG_API_ID:-}
+      TG_API_HASH: ${TG_API_HASH:-}
+      TG_BOT_TOKEN: ${TG_BOT_TOKEN:-}
+      TG_SESSION_STRING: ${TG_SESSION_STRING:-}
+      TG_TARGET_CHAT: ${TG_TARGET_CHAT:-}
+    profiles: ["crawler"]
