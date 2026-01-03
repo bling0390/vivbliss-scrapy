@@ -48,6 +48,7 @@ services:
       CRAWL_SPIDER: ${CRAWL_SPIDER:-products}
       MESSAGE_STRATEGY: ${MESSAGE_STRATEGY:-S2}
       CRAWL_LOG: ${CRAWL_LOG:-/data/logs/scrapy.log}
+      PYTHONPATH: /app
       TG_API_ID: ${TG_API_ID:-}
       TG_API_HASH: ${TG_API_HASH:-}
       TG_BOT_TOKEN: ${TG_BOT_TOKEN:-}
@@ -72,6 +73,7 @@ services:
       CRAWL_SPIDER: ${CRAWL_SPIDER:-products}
       MESSAGE_STRATEGY: ${MESSAGE_STRATEGY:-S2}
       CRAWL_LOG: ${CRAWL_LOG:-/data/logs/scrapy.log}
+      PYTHONPATH: /app
       TG_API_ID: ${TG_API_ID:-}
       TG_API_HASH: ${TG_API_HASH:-}
       TG_BOT_TOKEN: ${TG_BOT_TOKEN:-}
@@ -95,6 +97,7 @@ services:
       CRAWL_SPIDER: ${CRAWL_SPIDER:-products}
       MESSAGE_STRATEGY: ${MESSAGE_STRATEGY:-S2}
       CRAWL_LOG: ${CRAWL_LOG:-/data/logs/scrapy.log}
+      PYTHONPATH: /app
       TG_API_ID: ${TG_API_ID:-}
       TG_API_HASH: ${TG_API_HASH:-}
       TG_BOT_TOKEN: ${TG_BOT_TOKEN:-}
