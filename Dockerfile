@@ -27,4 +27,4 @@ COPY . .
 
 VOLUME ["/data"]
 
-CMD ["celery", "-A", "app.tasks", "worker", "-l", "info"]
+CMD ["celery", "-A", "app.celery_app", "worker", "-l", "info"]
