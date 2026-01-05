@@ -1,3 +1,4 @@
+
 Usage: celery [OPTIONS] COMMAND [ARGS]...
 
 Try 'celery --help' for help.
@@ -47,3 +48,4 @@ Traceback (most recent call last):
   File "<frozen importlib._bootstrap>", line 1140, in _find_and_load_unlocked
 
 ModuleNotFoundError: No module named 'app'
+
